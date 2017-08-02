@@ -27,7 +27,8 @@ import ssl
 from urllib.request import urlopen
 
 parser = argparse.ArgumentParser(
-    description='Programa para simular submissão programa de MC102 ao SuSy.')
+    description='Programa para simular submissão de programa de MC102 ao ' +
+    'SuSy.')
 feature_parser = parser.add_mutually_exclusive_group(required=False)
 feature_parser.add_argument('-d', '--download', dest='download',
                             action='store_true',
@@ -38,9 +39,9 @@ feature_parser.add_argument('-s', '--skip-download', dest='download',
                             help='Ignora downloads dos arquivos de teste.')
 parser.set_defaults(download=True)
 parser.add_argument('-t', '--turma', type=str, required=True,
-                    help='Turma e disciplina desejada. Exemplo: abcd.')
+                    help='Turma desejada. Exemplo: abcd.')
 parser.add_argument('-l', '--lab', type=int, required=True,
-                    help='Identificador do laboratório. Exmeplo: 00.')
+                    help='Identificador do laboratório. Exmeplo: 0.')
 
 args = vars(parser.parse_args())
 

@@ -39,14 +39,16 @@ feature_parser.add_argument('-s', '--skip-download', dest='download',
                             help='Ignora downloads dos arquivos de teste.')
 parser.set_defaults(download=True)
 parser.add_argument('-t', '--turma', type=str, required=True,
-                    help='Turma desejada. Exemplo: abcd.')
+                    help='Turma desejada. Exemplo: abcd')
 parser.add_argument('-l', '--lab', type=int, required=True,
-                    help='Identificador do laboratório. Exmeplo: 0.')
-
+                    help='Identificador do laboratório. Exemplo: 0')
+parser.add_argument('-i', '--input', type=str, default='.in',
+                    help='Extensão dos arquivos de entrada. Exemplo: .in')
 args = vars(parser.parse_args())
 
 # Download input and response files from SuSy
 args['lab'] = '%02d' % args['lab']
+
 
 if args['download']:
     print('Baixando arquivos de testes...')
@@ -60,7 +62,7 @@ if args['download']:
         url = ''.join((susy_url, '/', test_name))
 
         # Next input file
-        response = urlopen(url + '.in', context=context)
+        response = urlopen(url + args['input'], context=context)
 
         # Verify if file is not a HTML error message
         if response.headers.get_content_type() == 'text/html':
@@ -68,9 +70,9 @@ if args['download']:
 
         # Download and save input file
         filename = ''.join(('./', test_name))
-        with open(filename + '.in', 'w') as fp:
+        with open(filename + args['input'], 'w') as fp:
             fp.write(response.read().decode('ascii'))
-            print('  %s' % (filename + '.in'))
+            print('  %s' % (filename + args['input']))
 
         # Download and save response file
         response = urlopen(url + '.res', context=context)
@@ -80,7 +82,7 @@ if args['download']:
 
         filenumber += 1
 else:
-    filenumber = len(glob.glob1('./', "*.in")) + 1
+    filenumber = len(glob.glob1('./', "*" + args['input'])) + 1
 
 # Compile program file
 codefile = 'lab' + args['lab']
@@ -94,5 +96,5 @@ for i in range(1, filenumber):
     test_name = 'arq%02d' % (i)
     print('====== Testando %s' % test_name)
     os.system(
-        './{0} < {1}.in > {1}.out && diff {1}.out {1}.res'.format(codefile,
-                                                                  test_name))
+        (('./{0} < {1}' + args['input'] + ' > {1}.out && diff {1}.out {1}.res')
+         .format(codefile, test_name)))

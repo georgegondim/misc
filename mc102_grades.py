@@ -35,11 +35,8 @@ class SuSyParser(HTMLParser):
         if (self.re.match(data)):
             if data.endswith('resultado correto'):
                 self.tests.append(1)
-            elif data.endswith('resultado incorreto') \
-                    or data.find('erro de processamento'):
-                self.tests.append(0)
             else:
-                print('Error:', data)
+                self.tests.append(0)
 
     def reset_tests(self):
         self.tests = []

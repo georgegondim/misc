@@ -35,7 +35,8 @@ class SuSyParser(HTMLParser):
         if (self.re.match(data)):
             if data.endswith('resultado correto'):
                 self.tests.append(1)
-            elif data.endswith('resultado incorreto'):
+            elif data.endswith('resultado incorreto') \
+                    or data.find('erro de processamento'):
                 self.tests.append(0)
             else:
                 print('Error:', data)
@@ -76,13 +77,13 @@ def getSubmissions(num_abertos, path):
                             parser.feed(fp.read())
                             notas[turma][aluno] = parser.get_grade()
 
-        notasPath = os.path.join(path, 'notas.csv')
-        with open(notasPath, 'w') as fp:
-            fp.write('turma,usuario,nota\n')
-            for turma in sorted(notas):
-                for aluno in sorted(notas[turma]):
-                    fp.write('%s,%s,%.2f\n' %
-                             (turma, aluno, notas[turma][aluno]))
+                notasPath = os.path.join(turmaPath, 'notas.csv')
+                with open(notasPath, 'w') as fp:
+                    fp.write('turma,usuario,nota\n')
+                    if turma in notas:
+                        for aluno in sorted(notas[turma]):
+                            fp.write('%s,%s,%.2f\n' %
+                                     (turma, aluno, notas[turma][aluno]))
 
 
 if __name__ == '__main__':

@@ -44,11 +44,13 @@ parser.add_argument('-l', '--lab', type=int, required=True,
                     help='Identificador do laboratório. Exemplo: 0')
 parser.add_argument('-i', '--input', type=str, default='.in',
                     help='Extensão dos arquivos de entrada. Exemplo: .in')
+parser.add_argument('-r', '--response', type=str, default='arq*.res',
+                    help='Format para arquivo de resposta. Exemplo: arq*.res')
+
 args = vars(parser.parse_args())
 
 # Download input and response files from SuSy
 args['lab'] = '%02d' % args['lab']
-
 
 if args['download']:
     print('Baixando arquivos de testes...')
@@ -75,26 +77,32 @@ if args['download']:
             print('  %s' % (filename + args['input']))
 
         # Download and save response file
-        response = urlopen(url + '.res', context=context)
-        with open(filename + '.res', 'w') as fp:
+        response_name = (args['response'].split('*')[0] + '%02d'
+                         + args['response'].split('*')[1]) % filenumber
+        url = ''.join((susy_url, '/', response_name))
+        response = urlopen(url, context=context)
+        with open(response_name, 'w') as fp:
             fp.write(response.read().decode('utf-8'))
-            print('  %s' % (filename + '.res'))
+            print('  %s' % response_name)
 
         filenumber += 1
 else:
-    filenumber = len(glob.glob1('./', "*" + args['input'])) + 1
+    filenumber = len(glob.glob1('./', "arq*" + args['input'])) + 1
 
 # Compile program file
 codefile = 'lab' + args['lab']
 if not os.path.isfile(codefile + '.c'):
     print("Arquivo '%s' não encontrado" % (codefile + '.c'))
-os.system('gcc %s -o %s -Wall -Werror -ansi -pedantic' % (codefile + '.c',
-                                                          codefile))
+os.system('gcc %s -o %s -Wall -Werror -ansi -pedantic -lm' % (codefile + '.c',
+                                                              codefile))
 
 # Run diff
 for i in range(1, filenumber):
     test_name = 'arq%02d' % (i)
+    response_name = (args['response'].split('*')[0] + '%02d'
+                     + args['response'].split('*')[1]) % i
+
     print('====== Testando %s' % test_name)
     os.system(
-        (('./{0} < {1}' + args['input'] + ' > {1}.out && diff {1}.out {1}.res')
-         .format(codefile, test_name)))
+        (('./{0} < {1}' + args['input'] + ' > {1}.out && diff {1}.out {2}')
+         .format(codefile, test_name, response_name)))

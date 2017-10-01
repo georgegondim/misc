@@ -71,13 +71,13 @@ if args['download']:
         # Download and save input file
         filename = ''.join(('./', test_name))
         with open(filename + args['input'], 'w') as fp:
-            fp.write(response.read().decode('ascii'))
+            fp.write(response.read().decode('utf-8'))
             print('  %s' % (filename + args['input']))
 
         # Download and save response file
         response = urlopen(url + '.res', context=context)
         with open(filename + '.res', 'w') as fp:
-            fp.write(response.read().decode('ascii'))
+            fp.write(response.read().decode('utf-8'))
             print('  %s' % (filename + '.res'))
 
         filenumber += 1

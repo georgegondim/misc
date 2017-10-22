@@ -76,6 +76,7 @@ def getSubmissions(num_abertos, path):
 
                 notasPath = os.path.join(turmaPath, 'notas.csv')
                 with open(notasPath, 'w') as fp:
+                    fp.write('sep=,\n')
                     fp.write('turma,usuario,nota\n')
                     if turma in notas:
                         for aluno in sorted(notas[turma]):
